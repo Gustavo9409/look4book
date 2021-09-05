@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'look4book',
+    'look4book', #Initialization of new app
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

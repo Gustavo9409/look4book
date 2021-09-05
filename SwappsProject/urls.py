@@ -19,5 +19,5 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('look4book/', include('look4book.urls')),
+    path('look4book/', include('look4book.urls')), #Include of look4book urls
 ]
