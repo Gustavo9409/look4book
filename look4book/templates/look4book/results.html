@@ -4,9 +4,26 @@
         <title>RESULTS</title>
     </head>
     <body>
-        <p>Results:::</p>
-        {% for book in books %}
-            <li>{{book.title}}</li>
-        {% endfor %}
+        <h2>Results:::</h2>
+        <hr>
+        <div style="padding-left: 30px;">
+            {% if books|length > 0 %}
+                {% for book in books %}
+                    <li><label style="font-weight: bold;">Title:</label> {{book.title}}</li>
+                    <li><label style="font-weight: bold;">Publish date:</label> {{book.publish_date}}</li>
+                    <li><label style="font-weight: bold;"># pages:</label> {{book.number_of_pages}}</li>
+                    <li><label style="font-weight: bold;">Open Librery ID:</label> {{book.identifier_OL}}</li>
+                    <p><label style="font-weight: bold;">Authors:</label></p>
+                    <ul>
+                        {% for author in book.authors %}
+                            <li>{{author}}</li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
+                {% endfor %}
+            {% else %}
+                <h1 style="color:red;">¡¡No results found!!</h1>
+            {% endif %}
+        </div>
     </body>    
 </html>
