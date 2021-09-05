@@ -10,7 +10,7 @@ def get_books():
     'content-type': "application/json",
     'cache-control': "no-cache"
     }
-    r = requests.get(url, params={'bibkey': 'ISBN:0201558025,LCCN:93005405','jscmd':'data','format':'json'} )
+    r = requests.get(url, headers=headers, params=querystring )
     # r = requests.request("GET", url, headers=headers, params=querystring)
     
     r.raise_for_status()
@@ -27,7 +27,7 @@ def get_books():
         print(books_list)
     return books_list
 
-def get_books2():
+def get_books_by_id():
     conn = http.client.HTTPConnection("openlibrary.org")
 
     headers = {
@@ -43,14 +43,13 @@ def get_books2():
     books = json.loads(final_data)
     # print(json_obj)
 
-    books_list = ['ey ey']
+    books_list = []
     for element in books: 
         for value in books[element]:
             if value == 'title':
-                books_list.append(books[element][value])
+                books_list.append({'title':books[element][value]})
             # print(books[element]['title'])
-        
-        
+     
     print(books_list)
     
     return books_list
