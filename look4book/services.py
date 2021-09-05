@@ -1,33 +1,9 @@
 import os
-import requests
 import http.client
 import json
 
-def get_books():
-    url = 'http://openlibrary.org/api/books'
-    querystring = {'bibkey': 'ISBN:0201558025','jscmd':'data','format':'json'}
-    headers = {
-    'content-type': "application/json",
-    'cache-control': "no-cache"
-    }
-    r = requests.get(url, headers=headers, params=querystring )
-    # r = requests.request("GET", url, headers=headers, params=querystring)
-    
-    r.raise_for_status()
-    print("statusCode::")
-    print(r.status_code)
-    books_list = ['ey ey']
-    if r.status_code == 200:
-        books = r.json()
-        print('text::'+r.text)
-        print(books)
-        
-        for i in range(len(books)):
-            books_list.append(books['title'][i])
-        print(books_list)
-    return books_list
-
-def get_books_by_id():
+def get_books_by_id(ident_strings):
+    valid_info = ["title", "authors", "publish_date", "number_of_pages", "identifiers"]
     conn = http.client.HTTPConnection("openlibrary.org")
 
     headers = {
@@ -35,21 +11,80 @@ def get_books_by_id():
         'cache-control': "no-cache"
         }
 
-    conn.request("GET", "/api/books?bibkeys=ISBN%3A0201558025%2CLCCN%3A93005405&jscmd=data&format=json", headers=headers)
+    conn.request("GET", "/api/books?bibkeys="+ident_strings+"&jscmd=data&format=json", headers=headers)
 
     res = conn.getresponse()
     data = res.read()
     final_data = data.decode("utf-8")
     books = json.loads(final_data)
-    # print(json_obj)
 
     books_list = []
     for element in books: 
-        for value in books[element]:
-            if value == 'title':
-                books_list.append({'title':books[element][value]})
-            # print(books[element]['title'])
-     
-    print(books_list)
+        data = {}   
+        for attr in books[element]:
+            if attr in valid_info:               
+                if attr == "identifiers":
+                    val = books[element][attr]["openlibrary"]
+                    attr = "identifier_OL"
+                elif attr == "authors":
+                    tmp_obj = books[element][attr]
+                    auth_arr = []
+                    for obj in tmp_obj:
+                        auth_arr.append(obj["name"])
+                    val = auth_arr
+                else:
+                    val = books[element][attr]
+                data[attr] = val
+        books_list.append(data)        
     
     return books_list
+
+def get_books_by_param(book_title, author_name):
+    
+    lccn_arr = []
+    conn = http.client.HTTPConnection("openlibrary.org")
+
+    headers = {
+        'content-type': "application/json",
+        'cache-control': "no-cache"
+        }
+
+    titles_arr = book_title.split("|")
+    for tle in titles_arr:
+        api_title = tle.replace(" ", "+")
+        conn.request("GET", "/search.json?title="+api_title, headers=headers)
+
+        res = conn.getresponse()
+        data = res.read()
+        final_data = data.decode("utf-8")
+        books_info = json.loads(final_data)
+        
+        if len(books_info) > 0:
+            for element in books_info:
+                if element == "docs":
+                    for doc in books_info[element]:
+                        if "lccn" in doc:
+                            for ident in doc["lccn"]:
+                                lccn_arr.append("LCCN:"+ident)
+                                
+    authors_arr = author_name.split("|")     
+    for auth in authors_arr:
+        api_auth = auth.replace(" ", "+")
+        conn.request("GET", "/search.json?author="+api_auth, headers=headers)
+
+        res = conn.getresponse()
+        data = res.read()
+        final_data = data.decode("utf-8")
+        books_info = json.loads(final_data)
+        
+        if len(books_info) > 0:
+            for element in books_info:
+                if element == "docs":
+                    for doc in books_info[element]:
+                        if "lccn" in doc:
+                            for ident in doc["lccn"]:
+                                lccn_arr.append("LCCN:"+ident)          
+    
+    lccn_strings = ','.join(lccn_arr)
+    data = get_books_by_id(lccn_strings)
+    return data

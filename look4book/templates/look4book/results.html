@@ -5,6 +5,7 @@
     </head>
     <body>
         <h2>Results:::</h2>
+        <a href="{% url 'Home' %}">Back Home</a>
         <hr>
         <div style="padding-left: 30px;">
             {% if books|length > 0 %}
@@ -23,7 +24,7 @@
                 {% endfor %}
             {% else %}
                 <h1 style="color:red;">¡¡No results found!!</h1>
-            {% endif %}
+            {% endif %}        
         </div>
     </body>    
 </html>
