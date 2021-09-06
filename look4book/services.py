@@ -2,6 +2,9 @@ import os
 import http.client
 import json
 
+# This function use the open library api (Book API) through an html connection
+# ident_strings: Concatenate string of each book id (I chose lccn id)
+# Returns an array with specific information of each search
 def get_books_by_id(ident_strings):
     valid_info = ["title", "authors", "publish_date", "number_of_pages", "identifiers"]
     conn = http.client.HTTPConnection("openlibrary.org")
@@ -39,6 +42,10 @@ def get_books_by_id(ident_strings):
     
     return books_list
 
+# This function use the open library api (Search API) through an html connection
+# book_title: String of book's titles separated by pipe '|'
+# author_name: String of author's separated by pipe '|'
+# Returns a string of each book LCCN id
 def get_books_by_param(book_title, author_name):
     
     lccn_arr = []
